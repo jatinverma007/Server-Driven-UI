@@ -35,16 +35,28 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+    <key>UIUserInterfaceStyle</key>
+    <string>Light</string>
 	<!--
-	This PoC's backend serves plain http://, not https:// (see
-	ios-swiftui/README.md "Wiring this into an Xcode project", step 4).
-	NSAllowsArbitraryLoads disables ATS for DEBUG-only local development;
-	remove before any release build.
+	This PoC's backend used to be plain http://localhost during local dev
+	(see ios-swiftui/README.md "Wiring this into an Xcode project", step 4).
+	NSAllowsArbitraryLoads disables ATS; harmless to leave for now that
+	API_BASE_URL below points at a real https:// host, but should be
+	removed before any release build.
 	-->
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<!--
+	Default API base URL — see AppEnvironment.swift's resolution order.
+	Points at the deployed Vercel + Turso backend, not localhost, so the
+	app works off-Mac (device or simulator) without any per-run scheme
+	environment variable. Still overridable via the Xcode scheme's
+	Run → Arguments → Environment Variables if ever needed again.
+	-->
+	<key>API_BASE_URL</key>
+	<string>https://server-driven-ui-gamma.vercel.app/api/v1</string>
 </dict>
 </plist>

@@ -110,8 +110,25 @@ public final class APIClient: RemoteDataFetching, PublishedConfigFetching {
         // handling (see `fetchPublishedHomeScreen`) is what decides
         // freshness, exactly as designed.
         request.cachePolicy = .reloadIgnoringLocalCacheData
+
+        // Verbose request/response logging — printed to the Xcode console
+        // (os.Logger's .info level shows there for a locally-debugged run,
+        // same channel the .warning calls below already use). Intentionally
+        // unconditional rather than gated behind a DEBUG flag: this is a
+        // PoC whose whole point is to make the server-driven wire traffic
+        // visible while iterating, not production telemetry.
+        let ifNoneMatchNote = ifNoneMatch.map { " (If-None-Match: \($0))" } ?? ""
+        AppLogger.info("→ GET \(url.absoluteString)\(ifNoneMatchNote)", category: .network)
+
         do {
-            return try await session.data(for: request)
+            let (data, response) = try await session.data(for: request)
+            if let http = response as? HTTPURLResponse {
+                AppLogger.info(
+                    "← \(http.statusCode) \(url.absoluteString)\n\(Self.prettyBody(data))",
+                    category: .network
+                )
+            }
+            return (data, response)
         } catch let urlError as URLError {
             AppLogger.warning("Network request failed for \(path): \(urlError)", category: .network)
             switch urlError.code {
@@ -123,6 +140,20 @@ public final class APIClient: RemoteDataFetching, PublishedConfigFetching {
                 throw APIError.unexpected(urlError.localizedDescription)
             }
         }
+    }
+
+    /// Best-effort pretty-printed JSON for logging — falls back to raw
+    /// UTF-8 (or a byte-count placeholder) for a non-JSON or undecodable
+    /// body, since this exists purely to make console output readable and
+    /// must never itself throw or crash the request path.
+    private static func prettyBody(_ data: Data) -> String {
+        guard !data.isEmpty else { return "<empty body>" }
+        if let obj = try? JSONSerialization.jsonObject(with: data),
+           let pretty = try? JSONSerialization.data(withJSONObject: obj, options: [.prettyPrinted, .sortedKeys]),
+           let string = String(data: pretty, encoding: .utf8) {
+            return string
+        }
+        return String(data: data, encoding: .utf8) ?? "<\(data.count) bytes, non-UTF8>"
     }
 
     private func decode<T: Decodable>(_ type: T.Type, from data: Data) throws -> T {
