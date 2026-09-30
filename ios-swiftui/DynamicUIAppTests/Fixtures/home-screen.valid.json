@@ -1,0 +1,253 @@
+{
+  "configurationId": "cfg_home_v2_seed",
+  "schemaVersion": "2.0.0",
+  "revision": 1,
+  "status": "published",
+  "environment": "development",
+  "publishedAt": "2026-09-21T00:00:00.000Z",
+  "createdAt": "2026-09-21T00:00:00.000Z",
+  "updatedAt": "2026-09-21T00:00:00.000Z",
+  "cache": { "maxAgeSeconds": 300 },
+  "platformConstraints": {
+    "minAppVersion": { "ios": "1.5.65", "android": "0.8.8" }
+  },
+  "theme": {
+    "tokens": {
+      "surface.default": { "light": "#FFFFFF", "dark": "#1D1B18" },
+      "surface.transparent": { "light": "transparent", "dark": "transparent" },
+      "surface.info": { "light": "#E9F0FF", "dark": "#17293D" },
+      "actioncenter.kyc.background": { "light": "#ECF1FF", "dark": "#17293D" },
+      "actioncenter.kyc.border": { "light": "#356FFF", "dark": "#5B8CFF" },
+      "actioncenter.text.secondary": { "light": "#505050", "dark": "#D1D1D1" },
+      "banner.fastag.background": { "light": "#FFF8F2", "dark": "#33241B" },
+      "banner.rewards.background": { "light": "#F3F0FF", "dark": "#29213D" },
+      "banner.recharge.background": { "light": "#EAF8FF", "dark": "#173342" },
+      "surface.warning": { "light": "#FFF1E8", "dark": "#3A2410" },
+      "surface.accent": { "light": "#FDEDEC", "dark": "#3A1F1C" },
+      "surface.success": { "light": "#E4F3EC", "dark": "#132A20" },
+      "surface.critical": { "light": "#F6E3E5", "dark": "#301418" },
+      "text.primary": { "light": "#1D1B18", "dark": "#FFFFFF" },
+      "text.onAccent": { "light": "#FFFFFF", "dark": "#FFFFFF" }
+    }
+  },
+  "appIcons": {
+    "defaultIconId": "ic_launcher",
+    "supportedIconIds": ["ic_launcher", "ic_launcher_ny", "ic_launcher_26", "ic_launcher_ind", "ic_launcher_chris"],
+    "timeZone": "Asia/Kolkata",
+    "campaigns": [
+      { "id": "new_year", "iconId": "ic_launcher_ny", "startDate": "2025-12-31", "endDate": "2026-01-02", "priority": 10 },
+      { "id": "republic_day", "iconId": "ic_launcher_26", "startDate": "2026-01-25", "endDate": "2026-01-27", "priority": 10 },
+      { "id": "independence_day", "iconId": "ic_launcher_ind", "startDate": "2026-08-14", "endDate": "2026-08-16", "priority": 10 },
+      { "id": "christmas", "iconId": "ic_launcher_chris", "startDate": "2026-12-24", "endDate": "2026-12-26", "priority": 10 }
+    ]
+  },
+  "navigation": {
+    "bottom": [
+      { "id": "home", "label": { "kind": "literal", "value": "Home" }, "icon": { "kind": "remote", "url": "https://uat1.omnicard.co.in/file-utils/ZhYwcpaw.png" }, "actionId": "home" },
+      { "id": "cards", "label": { "kind": "literal", "value": "My Cards" }, "icon": { "kind": "remote", "url": "https://uat1.omnicard.co.in/file-utils/CUpe2MFQ.png" }, "actionId": "cards" },
+      { "id": "scan_pay", "label": { "kind": "literal", "value": "Scan & Pay" }, "icon": { "kind": "remote", "url": "https://uat1.omnicard.co.in/file-utils/Fsv9GK4e.png" }, "actionId": "scan_pay", "variant": "elevatedCenter" },
+      { "id": "reports", "label": { "kind": "literal", "value": "Reports" }, "icon": { "kind": "bundled", "name": "reports" }, "actionId": "reports", "audience": { "all": [ { "field": "user.type", "operator": "in", "value": ["B2B"] } ] } },
+      { "id": "rewards", "label": { "kind": "literal", "value": "Rewards" }, "icon": { "kind": "bundled", "name": "rewards" }, "actionId": "rewards", "audience": { "all": [ { "field": "user.type", "operator": "in", "value": ["B2C"] } ] } },
+      { "id": "history", "label": { "kind": "literal", "value": "History" }, "icon": { "kind": "remote", "url": "https://uat1.omnicard.co.in/file-utils/4ulPZyf4.png" }, "actionId": "history" }
+    ]
+  },
+  "screens": [
+    {
+      "screenId": "home",
+      "title": "Home",
+      "style": { "backgroundToken": "surface.default", "statusBarStyle": "auto" },
+      "components": [
+        {
+          "componentId": "header",
+          "type": "header",
+          "componentVersion": 1,
+          "enabled": true,
+          "style": { "backgroundToken": "surface.transparent" },
+          "props": {
+            "nameField": "userName",
+            "profileImageField": "userProfileImage",
+            "rightActions": [
+              { "id": "search", "icon": { "kind": "remote", "url": "https://uat1.omnicard.co.in/file-utils/0pkym3y9.png" }, "actionId": "open_search" },
+              { "id": "notifications", "icon": { "kind": "remote", "url": "https://uat1.omnicard.co.in/file-utils/kAbVfN2u.png" }, "actionId": "open_notifications", "badgeCountField": "unreadNotificationCount" }
+            ],
+            "subDetails": {
+              "variants": [
+                {
+                  "audience": { "all": [ { "field": "user.type", "operator": "in", "value": ["B2B"] } ] },
+                  "textType": "plain_text",
+                  "valueBinding": { "kind": "binding", "path": "user.enterpriseName", "fallback": "" }
+                },
+                {
+                  "audience": { "all": [ { "field": "user.type", "operator": "in", "value": ["B2C"] } ] },
+                  "textType": "badge",
+                  "valueBinding": { "kind": "binding", "path": "user.planName", "fallback": "" },
+                  "icon": { "kind": "bundled", "name": "upgrade_badge" },
+                  "actionId": "open_plan_details"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "componentId": "quick_actions",
+          "type": "quickActions",
+          "componentVersion": 1,
+          "enabled": true,
+          "style": { "backgroundToken": "surface.default" },
+          "layout": { "orientation": "horizontal", "viewType": "fixed", "columns": 4 },
+          "props": {
+            "title": { "kind": "literal", "value": "Quick Actions" },
+            "topItems": [
+              { "id": "check_balance", "label": { "kind": "literal", "value": "Check Balance" }, "media": { "leading": { "kind": "bundled", "name": "balance" } }, "actionId": "check_balance" }
+            ],
+            "items": [
+              { "id": "pay_anyone", "label": { "kind": "literal", "value": "Send Money" }, "media": { "leading": { "kind": "remote", "url": "https://uat1.omnicard.co.in/file-utils/v3uACLXx.png" } }, "actionId": "pay_anyone" },
+              { "id": "scan_pay", "label": { "kind": "literal", "value": "Scan & Pay" }, "media": { "leading": { "kind": "remote", "url": "https://uat1.omnicard.co.in/file-utils/Fsv9GK4e.png" } }, "actionId": "scan_pay" },
+              { "id": "add_money", "label": { "kind": "literal", "value": "Add Money" }, "media": { "leading": { "kind": "bundled", "name": "add_money" } }, "actionId": "add_money" },
+              { "id": "fastag", "label": { "kind": "literal", "value": "FASTag" }, "media": { "leading": { "kind": "remote", "url": "https://uat1.omnicard.co.in/file-utils/Xi4rX7mp.png" } }, "actionId": "fastag" }
+            ],
+            "bottomItems": [
+              { "id": "generate_upi_prompt", "label": { "kind": "literal", "value": "Generate UPI ID" }, "media": { "leading": { "kind": "remote", "url": "https://uat1.omnicard.co.in/file-utils/tyk9QhPN.png" } }, "actionId": "generate_custom_upi" },
+              { "id": "upi_id_chip", "accessibilityLabel": { "kind": "literal", "value": "Copy UPI ID" }, "media": { "leading": { "kind": "remote", "url": "https://uat1.omnicard.co.in/file-utils/tyk9QhPN.png" }, "trailing": { "kind": "remote", "url": "https://uat1.omnicard.co.in/file-utils/stebR2y1.png" } }, "actionId": "copy_upi_id" },
+              { "id": "style_qr_chip", "label": { "kind": "literal", "value": "Style Your QR" }, "media": { "leading": { "kind": "bundled", "name": "style_qr" } }, "actionId": "style_qr" }
+            ]
+          }
+        },
+        {
+          "componentId": "action_center",
+          "type": "actionCenter",
+          "componentVersion": 1,
+          "enabled": true,
+          "style": { "backgroundToken": "surface.transparent" },
+          "layout": { "orientation": "horizontal", "viewType": "scroll", "itemSizing": "fillViewport" },
+          "props": {
+            "title": { "kind": "literal", "value": "Action Center" },
+            "items": [
+              {
+                "id": "complete_kyc",
+                "style": { "backgroundToken": "actioncenter.kyc.background", "borderToken": "actioncenter.kyc.border" },
+                "media": { "leading": { "kind": "bundled", "name": "kyc" } },
+                "label": { "kind": "literal", "value": "Complete your KYC" },
+                "subtitle": { "kind": "literal", "value": "Update your details to keep your account active & compliant." },
+                "buttons": [
+                  { "id": "complete_kyc_cta", "label": { "kind": "literal", "value": "Complete KYC" }, "icon": { "kind": "bundled", "name": "arrow_right" }, "iconPosition": "end", "buttonStyle": { "variant": "solid", "role": "primary" }, "actionId": "complete_kyc" }
+                ]
+              },
+              {
+                "id": "invite",
+                "style": { "backgroundToken": "surface.warning" },
+                "media": { "leading": { "kind": "bundled", "name": "user_avatar_placeholder" } },
+                "label": { "kind": "literal", "value": "Ananya Sharma" },
+                "subtitle": { "kind": "literal", "value": "wants to activate their card" },
+                "meta": { "kind": "literal", "value": "+91 98765 43210" },
+                "buttons": [
+                  { "id": "invite_reject_cta", "label": { "kind": "literal", "value": "Reject" }, "icon": { "kind": "bundled", "name": "invite_reject" }, "iconPosition": "start", "buttonStyle": { "variant": "outline", "role": "critical" }, "actionId": "invite_reject" },
+                  { "id": "invite_approve_cta", "label": { "kind": "literal", "value": "Approve" }, "icon": { "kind": "bundled", "name": "invite_approve" }, "iconPosition": "start", "buttonStyle": { "variant": "solid", "role": "success" }, "actionId": "invite_approve" }
+                ]
+              },
+              {
+                "id": "quick_request_360",
+                "style": { "backgroundToken": "surface.accent" },
+                "media": { "leading": { "kind": "bundled", "name": "quick_request" } },
+                "label": { "kind": "literal", "value": "360° Request" },
+                "meta": { "kind": "literal", "value": "Advance | Add Expense" },
+                "accessibilityLabel": { "kind": "literal", "value": "Open 360 degree request" },
+                "buttons": [
+                  { "id": "request_advance_cta", "label": { "kind": "literal", "value": "" }, "icon": { "kind": "bundled", "name": "arrow" }, "iconPosition": "end", "actionId": "request_advance", "accessibilityLabel": { "kind": "literal", "value": "Request advance" } }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "componentId": "large_banner",
+          "type": "bannerCarousel",
+          "componentVersion": 1,
+          "enabled": true,
+          "style": { "backgroundToken": "surface.transparent" },
+          "layout": { "orientation": "horizontal", "viewType": "scroll", "itemSizing": "fillViewport" },
+          "props": {
+            "items": [
+              { "id": "fastag_recharge", "style": { "backgroundToken": "banner.fastag.background" }, "media": { "leading": { "kind": "bundled", "name": "banner_fastag" } }, "meta": { "kind": "literal", "value": "NEW" }, "label": { "kind": "literal", "value": "FastTag Recharge on OmniCard" }, "subtitle": { "kind": "literal", "value": "Recharge in seconds. Cruise through every journey." }, "accessibilityLabel": { "kind": "literal", "value": "FastTag recharge on OmniCard" }, "actionId": "fastag" },
+              { "id": "rewards_offer", "style": { "backgroundToken": "banner.rewards.background" }, "media": { "leading": { "kind": "bundled", "name": "banner_rewards" } }, "meta": { "kind": "literal", "value": "REWARDS" }, "label": { "kind": "literal", "value": "More rewards for you" }, "subtitle": { "kind": "literal", "value": "Earn Omnis and unlock exclusive offers." }, "accessibilityLabel": { "kind": "literal", "value": "More rewards for you" }, "actionId": "open_omnis" },
+              { "id": "recharge_reminder", "style": { "backgroundToken": "banner.recharge.background" }, "media": { "leading": { "kind": "bundled", "name": "banner_recharge" } }, "meta": { "kind": "literal", "value": "RECHARGE" }, "label": { "kind": "literal", "value": "Bills made simple" }, "subtitle": { "kind": "literal", "value": "Recharge on time and stay connected." }, "accessibilityLabel": { "kind": "literal", "value": "Bills made simple" }, "actionId": "mobile_recharge" }
+            ]
+          }
+        },
+        {
+          "componentId": "recharge_bills",
+          "type": "rechargeBills",
+          "componentVersion": 1,
+          "enabled": true,
+          "style": { "backgroundToken": "surface.default" },
+          "layout": { "orientation": "horizontal", "viewType": "fixed", "columns": 4 },
+          "props": {
+            "title": { "kind": "literal", "value": "Recharge & Bills" },
+            "topItems": [
+              { "id": "bharat_connect", "media": { "leading": { "kind": "bundled", "name": "bharat_connect" } }, "actionId": "open_bharat_connect", "accessibilityLabel": { "kind": "literal", "value": "Bharat Connect" } }
+            ],
+            "items": [
+              { "id": "electricity", "label": { "kind": "literal", "value": "Electricity Bill" }, "media": { "leading": { "kind": "remote", "url": "https://uat1.omnicard.co.in/file-utils/RCconqBG.png" }, "badge": { "kind": "remote", "url": "https://uat1.omnicard.co.in/file-utils/RBeK1AJK.png" } }, "accessibilityLabel": { "kind": "literal", "value": "Electricity Bill, offer available" }, "actionId": "electricity_bill" },
+              { "id": "gas", "label": { "kind": "literal", "value": "Piped Gas" }, "media": { "leading": { "kind": "remote", "url": "https://uat1.omnicard.co.in/file-utils/gaUkOEH6.png" } }, "actionId": "gas_bill" },
+              { "id": "mobile", "label": { "kind": "literal", "value": "Mobile Recharge" }, "media": { "leading": { "kind": "remote", "url": "https://uat1.omnicard.co.in/file-utils/BVV5uJl6.png" } }, "actionId": "mobile_recharge" },
+              { "id": "dth", "label": { "kind": "literal", "value": "DTH Recharge" }, "media": { "leading": { "kind": "remote", "url": "https://uat1.omnicard.co.in/file-utils/RUEy3q9T.png" } }, "actionId": "dth_recharge" }
+            ],
+            "bottomItems": [
+              { "id": "plan_expired_nudge", "label": { "kind": "literal", "value": "Plan Expired? Recharge now" }, "media": { "leading": { "kind": "bundled", "name": "wallet_alert" } }, "actionId": "recharge_expired_plan" },
+              { "id": "view_more", "label": { "kind": "literal", "value": "View More" }, "media": { "leading": { "kind": "bundled", "name": "arrow_right" } }, "actionId": "view_all_bills" }
+            ]
+          }
+        },
+        {
+          "componentId": "small_banner",
+          "type": "bannerCarousel",
+          "componentVersion": 1,
+          "enabled": true,
+          "style": { "backgroundToken": "surface.transparent" },
+          "layout": { "orientation": "horizontal", "viewType": "scroll", "itemSizing": "fillViewport" },
+          "props": { "dataSourceId": "banners.small" }
+        },
+        {
+          "componentId": "monthly_claim",
+          "type": "monthlyClaim",
+          "componentVersion": 1,
+          "enabled": true,
+          "audience": { "all": [ { "field": "user.type", "operator": "in", "value": ["B2B"] } ] },
+          "style": { "backgroundToken": "surface.default" },
+          "layout": { "orientation": "horizontal", "viewType": "fixed", "columns": 2 },
+          "props": {
+            "title": { "kind": "literal", "value": "This month's claim" },
+            "dataSourceId": "claims.monthlySummary",
+            "topItems": [
+              { "id": "download_report", "label": { "kind": "literal", "value": "Download report" }, "media": { "leading": { "kind": "bundled", "name": "download" } }, "actionId": "download_claim_report" }
+            ],
+            "items": [
+              { "id": "approved", "style": { "backgroundToken": "surface.success" }, "label": { "kind": "literal", "value": "Approved" }, "actionId": "view_approved_claims" },
+              { "id": "rejected", "style": { "backgroundToken": "surface.critical" }, "label": { "kind": "literal", "value": "Rejected" }, "actionId": "view_rejected_claims" }
+            ]
+          }
+        },
+        {
+          "componentId": "rewards_hub",
+          "type": "rewardsHub",
+          "componentVersion": 1,
+          "enabled": true,
+          "audience": { "all": [ { "field": "user.type", "operator": "in", "value": ["B2C"] } ] },
+          "style": { "backgroundToken": "surface.default" },
+          "layout": { "orientation": "horizontal", "viewType": "fixed", "columns": 3 },
+          "props": {
+            "title": { "kind": "literal", "value": "Offers & Rewards" },
+            "topItems": [
+              { "id": "view_more", "label": { "kind": "literal", "value": "View more" }, "media": { "leading": { "kind": "bundled", "name": "arrow" } }, "actionId": "view_all_rewards" }
+            ],
+            "items": [
+              { "id": "brand_vouchers", "label": { "kind": "literal", "value": "Brand Vouchers" }, "media": { "leading": { "kind": "remote", "url": "https://uat1.omnicard.co.in/file-utils/Intf3P1p.png" } }, "actionId": "open_brand_vouchers" },
+              { "id": "omnis", "label": { "kind": "literal", "value": "Omnis" }, "media": { "leading": { "kind": "remote", "url": "https://uat1.omnicard.co.in/file-utils/zfwOTxl4.png" } }, "actionId": "open_omnis" },
+              { "id": "cashback", "label": { "kind": "literal", "value": "Cashback" }, "media": { "leading": { "kind": "remote", "url": "https://uat1.omnicard.co.in/file-utils/ZetHh7lb.png" } }, "actionId": "open_cashback" }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,161 @@
+{
+  "_invalidBecause": [
+    "1. appIcons.campaigns[2] (holi) startDate/endDate are the literal string '<CONFIRM_DATE>' — fails format:date (schema-level) and is a placeholder (semantic E_UNRESOLVED_PLACEHOLDER).",
+    "2. appIcons.campaigns[3] (independence_day) iconId is '<UPLOAD_PENDING:ic_launcher_ind>' and is NOT in appIcons.supportedIconIds — semantic E_UNSUPPORTED_ICON_ID / E_UNRESOLVED_PLACEHOLDER.",
+    "3. screens[0].components[1] (quick_actions) and screens[0].components[6] (duplicate_widget) both use componentId 'quick_actions' — semantic E_DUPLICATE_COMPONENT_ID.",
+    "4. screens[0].components[2] (action_center) items[0].media.leading is {kind:'remote', url:'<UPLOAD_PENDING:kyc>'} — fails the schema's uri format AND is a placeholder.",
+    "5. screens[0].components[2].props.items[1].buttons[0].actionId is 'wire_transfer_all_funds', not in the action catalog — semantic E_UNKNOWN_ACTION.",
+    "6. screens[0].components[3] (large_banner) props.dataSourceId is '/api/v1/banners/large_banner' (a raw legacy endpoint, not a catalog id) — semantic E_UNKNOWN_DATA_SOURCE.",
+    "7. screens[0].components[4] (recharge_bills) style.backgroundToken is 'surface.nonexistent' — semantic E_UNKNOWN_THEME_TOKEN (token not present in theme.tokens).",
+    "8. platformConstraints.minAppVersion.ios is '1.65' — fails the schema's semver pattern.",
+    "9. screens[0].components[5] (monthly_claim) has an empty button label with no accessibilityLabel — semantic E_MISSING_ACCESSIBILITY_LABEL."
+  ],
+  "configurationId": "cfg_home_v2_invalid_fixture",
+  "schemaVersion": "2.0.0",
+  "revision": 0,
+  "status": "draft",
+  "environment": "development",
+  "publishedAt": null,
+  "platformConstraints": {
+    "minAppVersion": { "ios": "1.65", "android": "0.8.8" }
+  },
+  "theme": {
+    "tokens": {
+      "surface.default": { "light": "#FFFFFF", "dark": "#1D1B18" },
+      "surface.transparent": { "light": "transparent", "dark": "transparent" }
+    }
+  },
+  "appIcons": {
+    "defaultIconId": "ic_launcher",
+    "supportedIconIds": ["ic_launcher", "ic_launcher_ny", "ic_launcher_26", "ic_launcher_chris"],
+    "timeZone": "Asia/Kolkata",
+    "campaigns": [
+      { "id": "new_year", "iconId": "ic_launcher_ny", "startDate": "2025-12-31", "endDate": "2026-01-02", "priority": 10 },
+      { "id": "republic_day", "iconId": "ic_launcher_26", "startDate": "2026-01-25", "endDate": "2026-01-27", "priority": 10 },
+      { "id": "holi", "iconId": "ic_launcher_holi", "startDate": "<CONFIRM_DATE>", "endDate": "<CONFIRM_DATE>", "priority": 10 },
+      { "id": "independence_day", "iconId": "<UPLOAD_PENDING:ic_launcher_ind>", "startDate": "2026-08-14", "endDate": "2026-08-16", "priority": 10 }
+    ]
+  },
+  "navigation": {
+    "bottom": [
+      { "id": "home", "label": { "kind": "literal", "value": "Home" }, "icon": { "kind": "remote", "url": "https://uat1.omnicard.co.in/file-utils/ZhYwcpaw.png" }, "actionId": "home" }
+    ]
+  },
+  "screens": [
+    {
+      "screenId": "home",
+      "title": "Home",
+      "style": { "backgroundToken": "surface.default", "statusBarStyle": "auto" },
+      "components": [
+        {
+          "componentId": "header",
+          "type": "header",
+          "componentVersion": 1,
+          "enabled": true,
+          "style": { "backgroundToken": "surface.transparent" },
+          "props": { "nameField": "userName", "profileImageField": "userProfileImage" }
+        },
+        {
+          "componentId": "quick_actions",
+          "type": "quickActions",
+          "componentVersion": 1,
+          "enabled": true,
+          "style": { "backgroundToken": "surface.default" },
+          "layout": { "orientation": "horizontal", "viewType": "fixed", "columns": 4 },
+          "props": {
+            "title": { "kind": "literal", "value": "Quick Actions" },
+            "items": [
+              { "id": "pay_anyone", "label": { "kind": "literal", "value": "Send Money" }, "actionId": "pay_anyone" }
+            ]
+          }
+        },
+        {
+          "componentId": "action_center",
+          "type": "actionCenter",
+          "componentVersion": 1,
+          "enabled": true,
+          "style": { "backgroundToken": "surface.transparent" },
+          "layout": { "orientation": "horizontal", "viewType": "scroll", "itemSizing": "fillViewport" },
+          "props": {
+            "title": { "kind": "literal", "value": "Action Center" },
+            "items": [
+              {
+                "id": "complete_kyc",
+                "style": { "backgroundToken": "surface.info" },
+                "media": { "leading": { "kind": "remote", "url": "<UPLOAD_PENDING:kyc>" } },
+                "label": { "kind": "literal", "value": "Complete your KYC" },
+                "buttons": [
+                  { "id": "complete_kyc_cta", "label": { "kind": "literal", "value": "Complete KYC" }, "actionId": "complete_kyc" }
+                ]
+              },
+              {
+                "id": "risky_item",
+                "style": { "backgroundToken": "surface.warning" },
+                "label": { "kind": "literal", "value": "Move all funds" },
+                "buttons": [
+                  { "id": "wire_all_cta", "label": { "kind": "literal", "value": "Do it" }, "actionId": "wire_transfer_all_funds" }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "componentId": "large_banner",
+          "type": "bannerCarousel",
+          "componentVersion": 1,
+          "enabled": true,
+          "style": { "backgroundToken": "surface.transparent" },
+          "layout": { "orientation": "horizontal", "viewType": "scroll", "itemSizing": "fillViewport" },
+          "props": { "dataSourceId": "/api/v1/banners/large_banner" }
+        },
+        {
+          "componentId": "recharge_bills",
+          "type": "rechargeBills",
+          "componentVersion": 1,
+          "enabled": true,
+          "style": { "backgroundToken": "surface.nonexistent" },
+          "layout": { "orientation": "horizontal", "viewType": "fixed", "columns": 4 },
+          "props": {
+            "title": { "kind": "literal", "value": "Recharge & Bills" },
+            "items": [
+              { "id": "electricity", "label": { "kind": "literal", "value": "Electricity Bill" }, "actionId": "electricity_bill" }
+            ]
+          }
+        },
+        {
+          "componentId": "monthly_claim",
+          "type": "monthlyClaim",
+          "componentVersion": 1,
+          "enabled": true,
+          "audience": { "all": [ { "field": "user.type", "operator": "in", "value": ["B2B"] } ] },
+          "style": { "backgroundToken": "surface.default" },
+          "layout": { "orientation": "horizontal", "viewType": "fixed", "columns": 2 },
+          "props": {
+            "title": { "kind": "literal", "value": "This month's claim" },
+            "dataSourceId": "claims.monthlySummary",
+            "topItems": [
+              { "id": "download_report", "label": { "kind": "literal", "value": "" }, "actionId": "download_claim_report" }
+            ],
+            "items": [
+              { "id": "approved", "style": { "backgroundToken": "surface.success" }, "label": { "kind": "literal", "value": "Approved" }, "actionId": "view_approved_claims" }
+            ]
+          }
+        },
+        {
+          "componentId": "quick_actions",
+          "type": "quickActions",
+          "componentVersion": 1,
+          "enabled": true,
+          "style": { "backgroundToken": "surface.default" },
+          "layout": { "orientation": "horizontal", "viewType": "fixed", "columns": 4 },
+          "props": {
+            "title": { "kind": "literal", "value": "Duplicate ID demo" },
+            "items": [
+              { "id": "duplicate_demo", "label": { "kind": "literal", "value": "Duplicate componentId" }, "actionId": "fastag" }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

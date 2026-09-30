@@ -1,0 +1,544 @@
+{
+  "schemaVersion": "1.0",
+  "minAppVersion": {
+    "android": "0.8.8",
+    "iOS": "1.5.65"
+  },
+  "themes": {
+    "default": {
+      "light": "#FFFFFF",
+      "dark": "#1D1B18"
+    },
+    "transparent": {
+      "light": "transparent",
+      "dark": "transparent"
+    },
+    "info": {
+      "light": "#E9F0FF",
+      "dark": "#17293D"
+    },
+    "warning": {
+      "light": "#FFF1E8",
+      "dark": "#3A2410"
+    },
+    "accent": {
+      "light": "#FDEDEC",
+      "dark": "#3A1F1C"
+    },
+    "success": {
+      "light": "#E4F3EC",
+      "dark": "#132A20"
+    },
+    "critical": {
+      "light": "#F6E3E5",
+      "dark": "#301418"
+    }
+  },
+  "style": {
+    "backgroundTheme": "default",
+    "statusBar": "LIGHT"
+  },
+  "launcherIcon": {
+    "defaultIconId": "ic_launcher",
+    "campaigns": [
+      {
+        "id": "new_year",
+        "startDate": "2025-12-31",
+        "endDate": "2026-01-02",
+        "iconId": "ic_launcher_ny"
+      },
+      {
+        "id": "republic_day",
+        "startDate": "2026-01-25",
+        "endDate": "2026-01-27",
+        "iconId": "ic_launcher_26"
+      },
+      {
+        "id": "holi",
+        "startDate": "<CONFIRM_DATE>",
+        "endDate": "<CONFIRM_DATE>",
+        "iconId": "ic_launcher_holi"
+      },
+      {
+        "id": "independence_day",
+        "startDate": "2026-08-14",
+        "endDate": "2026-08-16",
+        "iconId": "<UPLOAD_PENDING:ic_launcher_ind>"
+      },
+      {
+        "id": "raksha_bandhan",
+        "startDate": "<CONFIRM_DATE>",
+        "endDate": "<CONFIRM_DATE>",
+        "iconId": "<UPLOAD_PENDING:ic_launcher_rakhi>"
+      },
+      {
+        "id": "diwali",
+        "startDate": "<CONFIRM_DATE>",
+        "endDate": "<CONFIRM_DATE>",
+        "iconId": "<UPLOAD_PENDING:ic_launcher_diwali>"
+      },
+      {
+        "id": "christmas",
+        "startDate": "2026-12-24",
+        "endDate": "2026-12-26",
+        "iconId": "ic_launcher_chris"
+      }
+    ]
+  },
+  "bottomNavigation": [
+    {
+      "id": "home",
+      "title": "Home",
+      "icon": "https://uat1.omnicard.co.in/file-utils/ZhYwcpaw.png",
+      "actionId": "home"
+    },
+    {
+      "id": "cards",
+      "title": "My Cards",
+      "icon": "https://uat1.omnicard.co.in/file-utils/CUpe2MFQ.png",
+      "actionId": "cards"
+    },
+    {
+      "id": "scan_pay",
+      "title": "Scan & Pay",
+      "icon": "https://uat1.omnicard.co.in/file-utils/Fsv9GK4e.png",
+      "actionId": "scan_pay",
+      "variant": "elevated_center"
+    },
+    {
+      "id": "reports",
+      "title": "Reports",
+      "icon": "<UPLOAD_PENDING:reports>",
+      "actionId": "reports",
+      "userType": "B2B"
+    },
+    {
+      "id": "rewards",
+      "title": "Rewards",
+      "icon": "<UPLOAD_PENDING:rewards>",
+      "actionId": "rewards",
+      "userType": "B2C"
+    },
+    {
+      "id": "history",
+      "title": "History",
+      "icon": "https://uat1.omnicard.co.in/file-utils/4ulPZyf4.png",
+      "actionId": "history"
+    }
+  ],
+  "widgets": [
+    {
+      "id": "header",
+      "type": "header",
+      "position": 1
+    },
+    {
+      "id": "quick_actions",
+      "type": "quick_actions",
+      "position": 2
+    },
+    {
+      "id": "action_center",
+      "type": "action_center",
+      "position": 3
+    },
+    {
+      "id": "large_banner",
+      "type": "banner",
+      "position": 4
+    },
+    {
+      "id": "recharge_bills",
+      "type": "recharge_bills",
+      "position": 5
+    },
+    {
+      "id": "small_banner",
+      "type": "banner",
+      "position": 6
+    },
+    {
+      "id": "monthly_claim",
+      "type": "monthly_claim",
+      "position": 7,
+      "userType": "B2B"
+    },
+    {
+      "id": "rewards_hub",
+      "type": "rewards_hub",
+      "position": 7,
+      "userType": "B2C"
+    }
+  ],
+  "widgetData": {
+    "header": {
+      "type": "header",
+      "style": {
+        "backgroundTheme": "transparent"
+      },
+      "nameField": "userName",
+      "profileImageField": "userProfileImage",
+      "rightActions": [
+        {
+          "id": "search",
+          "icon": "https://uat1.omnicard.co.in/file-utils/0pkym3y9.png",
+          "actionId": "open_search"
+        },
+        {
+          "id": "notifications",
+          "icon": "https://uat1.omnicard.co.in/file-utils/kAbVfN2u.png",
+          "actionId": "open_notifications",
+          "badgeCountField": "unreadNotificationCount"
+        }
+      ],
+      "subDetails": {
+        "variants": [
+          {
+            "userType": "B2B",
+            "style": {
+              "textType": "plain_text"
+            },
+            "valueField": "enterpriseName"
+          },
+          {
+            "userType": "B2C",
+            "style": {
+              "textType": "badge"
+            },
+            "valueField": "planName",
+            "icon": "<UPLOAD_PENDING:upgrade_badge>",
+            "actionId": "open_plan_details"
+          }
+        ]
+      }
+    },
+    "quick_actions": {
+      "type": "quick_actions",
+      "title": "Quick Actions",
+      "style": {
+        "backgroundTheme": "default"
+      },
+      "layout": {
+        "orientation": "horizontal",
+        "viewType": "fixed",
+        "columns": 4
+      },
+      "topItems": [
+        {
+          "id": "check_balance",
+          "icon": "<UPLOAD_PENDING:balance>",
+          "title": "Check Balance",
+          "actionId": "check_balance"
+        }
+      ],
+      "items": [
+        {
+          "id": "pay_anyone",
+          "icon": "https://uat1.omnicard.co.in/file-utils/v3uACLXx.png",
+          "title": "Send Money",
+          "actionId": "pay_anyone"
+        },
+        {
+          "id": "scan_pay",
+          "icon": "https://uat1.omnicard.co.in/file-utils/Fsv9GK4e.png",
+          "title": "Scan & Pay",
+          "actionId": "scan_pay"
+        },
+        {
+          "id": "add_money",
+          "icon": "<UPLOAD_PENDING:add_money>",
+          "title": "Add Money",
+          "actionId": "add_money"
+        },
+        {
+          "id": "fastag",
+          "icon": "https://uat1.omnicard.co.in/file-utils/Xi4rX7mp.png",
+          "title": "FASTag",
+          "actionId": "fastag"
+        }
+      ],
+      "bottomItems": [
+        {
+          "id": "generate_upi_prompt",
+          "icon": "https://uat1.omnicard.co.in/file-utils/tyk9QhPN.png",
+          "title": "Generate UPI ID",
+          "actionId": "generate_custom_upi"
+        },
+        {
+          "id": "upi_id_chip",
+          "icon": "https://uat1.omnicard.co.in/file-utils/tyk9QhPN.png",
+          "trailingIcon": "https://uat1.omnicard.co.in/file-utils/stebR2y1.png",
+          "actionId": "copy_upi_id"
+        },
+        {
+          "id": "style_qr_chip",
+          "icon": "<UPLOAD_PENDING:style_qr>",
+          "title": "Style Your QR",
+          "actionId": "style_qr"
+        }
+      ]
+    },
+    "action_center": {
+      "type": "action_center",
+      "title": "Action Center",
+      "style": {
+        "backgroundTheme": "transparent"
+      },
+      "layout": {
+        "orientation": "horizontal",
+        "viewType": "scroll",
+        "isWidth": true
+      },
+      "items": [
+        {
+          "id": "complete_kyc",
+          "priority": 1,
+          "style": {
+            "backgroundTheme": "info"
+          },
+          "icon": "<UPLOAD_PENDING:kyc>",
+          "title": "Complete your KYC",
+          "subtitle": "Update your details to keep your account active & compliant.",
+          "buttons": [
+            {
+              "text": "Complete KYC",
+              "icon": "<UPLOAD_PENDING:arrow_right>",
+              "actionId": "complete_kyc",
+              "iconPosition": "end"
+            }
+          ]
+        },
+        {
+          "id": "invite",
+          "priority": 2,
+          "style": {
+            "backgroundTheme": "warning"
+          },
+          "icon": "user_name_icon",
+          "title": "invited_user_name",
+          "subtitle": "wants to activate their card",
+          "meta": "invite_mobile_no",
+          "buttons": [
+            {
+              "text": "Reject",
+              "icon": "<UPLOAD_PENDING:invite_reject>",
+              "style": {
+                "backgroundTheme": "outline_critical"
+              },
+              "actionId": "invite_reject",
+              "iconPosition": "start"
+            },
+            {
+              "text": "Approve",
+              "icon": "<UPLOAD_PENDING:invite_approve>",
+              "style": {
+                "backgroundTheme": "solid_success"
+              },
+              "actionId": "invite_approve",
+              "iconPosition": "start"
+            }
+          ],
+          "dataSource": {
+            "type": "api",
+            "endpoint": "user_response"
+          }
+        },
+        {
+          "id": "quick_request_360",
+          "priority": 3,
+          "userType": "B2B",
+          "style": {
+            "backgroundTheme": "accent"
+          },
+          "icon": "<UPLOAD_PENDING:quick_request>",
+          "title": "360° Request",
+          "meta": "Advance | Add Expense",
+          "buttons": [
+            {
+              "text": "",
+              "icon": "<UPLOAD_PENDING:arrow>",
+              "actionId": "request_advance",
+              "iconPosition": "end"
+            }
+          ]
+        }
+      ]
+    },
+    "large_banner": {
+      "type": "banner",
+      "style": {
+        "backgroundTheme": "transparent"
+      },
+      "layout": {
+        "orientation": "horizontal",
+        "viewType": "scroll",
+        "isWidth": true
+      },
+      "dataSource": {
+        "type": "api",
+        "endpoint": "/api/v1/banners/large_banner",
+        "method": "GET"
+      }
+    },
+    "recharge_bills": {
+      "type": "recharge_bills",
+      "title": "Recharge & Bills",
+      "style": {
+        "backgroundTheme": "default"
+      },
+      "layout": {
+        "orientation": "horizontal",
+        "viewType": "fixed",
+        "columns": 4
+      },
+      "topItems": [
+        {
+          "id": "bharat_connect",
+          "icon": "<UPLOAD_PENDING:bharat_connect>",
+          "actionId": "open_bharat_connect"
+        }
+      ],
+      "items": [
+        {
+          "id": "electricity",
+          "icon": "https://uat1.omnicard.co.in/file-utils/RCconqBG.png",
+          "title": "Electricity Bill",
+          "badge": "https://uat1.omnicard.co.in/file-utils/RBeK1AJK.png",
+          "actionId": "electricity_bill"
+        },
+        {
+          "id": "gas",
+          "icon": "https://uat1.omnicard.co.in/file-utils/gaUkOEH6.png",
+          "title": "Piped Gas",
+          "actionId": "gas_bill"
+        },
+        {
+          "id": "mobile",
+          "icon": "https://uat1.omnicard.co.in/file-utils/BVV5uJl6.png",
+          "title": "Mobile Recharge",
+          "actionId": "mobile_recharge"
+        },
+        {
+          "id": "dth",
+          "icon": "https://uat1.omnicard.co.in/file-utils/RUEy3q9T.png",
+          "title": "DTH Recharge",
+          "actionId": "dth_recharge"
+        }
+      ],
+      "bottomItems": [
+        {
+          "id": "plan_expired_nudge",
+          "icon": "<UPLOAD_PENDING:wallet_alert>",
+          "title": "Plan Expired? Recharge now",
+          "actionId": "recharge_expired_plan"
+        },
+        {
+          "id": "view_more",
+          "icon": "<UPLOAD_PENDING:arrow_right>",
+          "title": "View More",
+          "actionId": "view_all_bills"
+        }
+      ]
+    },
+    "small_banner": {
+      "type": "banner",
+      "style": {
+        "backgroundTheme": "transparent"
+      },
+      "layout": {
+        "orientation": "horizontal",
+        "viewType": "scroll",
+        "isWidth": true
+      },
+      "dataSource": {
+        "type": "api",
+        "endpoint": "/api/v1/banners/small_banner",
+        "method": "GET"
+      }
+    },
+    "monthly_claim": {
+      "type": "monthly_claim",
+      "userType": "B2B",
+      "title": "This month's claim",
+      "style": {
+        "backgroundTheme": "default"
+      },
+      "layout": {
+        "orientation": "horizontal",
+        "viewType": "fixed",
+        "columns": 2
+      },
+      "topItems": [
+        {
+          "text": "Download report",
+          "icon": "<UPLOAD_PENDING:download>",
+          "actionId": "download_claim_report"
+        }
+      ],
+      "dataSource": {
+        "type": "api",
+        "endpoint": "/api/v1/claims/monthly-summary",
+        "method": "GET"
+      },
+      "items": [
+        {
+          "id": "approved",
+          "style": {
+            "backgroundTheme": "success"
+          },
+          "title": "Approved",
+          "actionId": "view_approved_claims"
+        },
+        {
+          "id": "rejected",
+          "style": {
+            "backgroundTheme": "critical"
+          },
+          "title": "Rejected",
+          "actionId": "view_rejected_claims"
+        }
+      ]
+    },
+    "rewards_hub": {
+      "type": "rewards_hub",
+      "userType": "B2C",
+      "title": "Offers & Rewards",
+      "style": {
+        "backgroundTheme": "default"
+      },
+      "layout": {
+        "orientation": "horizontal",
+        "viewType": "fixed",
+        "columns": 3
+      },
+      "topItems": [
+        {
+          "id": "view_more",
+          "title": "View more",
+          "actionId": "view_all_rewards",
+          "icon": "<UPLOAD_PENDING:arrow>"
+        }
+      ],
+      "items": [
+        {
+          "id": "brand_vouchers",
+          "icon": "https://uat1.omnicard.co.in/file-utils/Intf3P1p.png",
+          "title": "Brand Vouchers",
+          "actionId": "open_brand_vouchers"
+        },
+        {
+          "id": "omnis",
+          "icon": "https://uat1.omnicard.co.in/file-utils/zfwOTxl4.png",
+          "title": "Omnis",
+          "actionId": "open_omnis"
+        },
+        {
+          "id": "cashback",
+          "icon": "https://uat1.omnicard.co.in/file-utils/ZetHh7lb.png",
+          "title": "Cashback",
+          "actionId": "open_cashback"
+        }
+      ]
+    }
+  }
+}

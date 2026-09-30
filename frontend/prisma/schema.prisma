@@ -1,0 +1,98 @@
+// Prisma schema for the OmniCard SDUI backend.
+//
+// Persistence abstraction note (see docs/architecture.md §"Persistence"):
+// nothing outside this file and `src/lib/configuration/repository.ts` knows
+// this is SQLite. Swapping to Postgres for a real deployment is:
+//   1. change `provider` below to "postgresql"
+//   2. point `DATABASE_URL` at a Postgres instance
+//   3. re-run `prisma migrate`
+// No application code changes, because all reads/writes go through the
+// `ConfigurationRepository` interface, never through `PrismaClient` directly
+// outside `lib/configuration/`.
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters", "queryCompiler"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+/// A single mutable "draft" row per screenKey ("home"). Overwritten in place
+/// by PUT /draft. Never returned by the published endpoint.
+model DraftConfiguration {
+  id         String   @id @default(cuid())
+  screenKey  String   @unique
+  content    String // JSON string of the HomeScreenConfiguration (status:"draft")
+  updatedAt  DateTime @updatedAt
+  updatedBy  String // mock user id, see lib/authorization
+}
+
+/// Immutable, append-only revision history. A publish creates a new row here
+/// and, inside the same transaction, repoints PublishedPointer at it.
+/// Rollback ("restore") also creates a *new* row (never mutates or deletes
+/// an old one) so history stays monotonic and fully replayable.
+model ConfigurationRevision {
+  id          String   @id @default(cuid())
+  screenKey   String
+  revision    Int
+  content     String // JSON string of the HomeScreenConfiguration (status:"published")
+  etag        String // sha256 of `content`, used for If-None-Match / 304
+  createdAt   DateTime @default(now())
+  createdBy   String
+  restoredFromRevision Int? // set when this revision was created by a "restore" of an earlier one
+
+  @@unique([screenKey, revision])
+  @@index([screenKey])
+}
+
+/// The single pointer to "which revision is currently live" per screen.
+/// Updated atomically together with the ConfigurationRevision insert.
+model PublishedPointer {
+  screenKey        String   @id
+  currentRevision  Int
+  updatedAt        DateTime @updatedAt
+}
+
+/// Append-only audit trail for every draft save / validate / publish / restore.
+model AuditLogEntry {
+  id         String   @id @default(cuid())
+  screenKey  String
+  action     String // "draft_saved" | "validated" | "published" | "restored" | "publish_rejected"
+  actor      String // mock user id
+  role       String // viewer | editor | publisher | admin
+  detail     String // short human-readable summary, never full PII/user data
+  revision   Int? // set for publish/restore
+  createdAt  DateTime @default(now())
+
+  @@index([screenKey, createdAt])
+}
+
+/// Manually-provisioned portal users (see scripts/create-user.ts — there is
+/// no self-service signup). `passwordHash` is a salted scrypt hash
+/// ("scrypt:<saltHex>:<hashHex>", see lib/authentication/passwordHash.ts),
+/// never a plaintext password.
+model User {
+  id            String   @id @default(cuid())
+  username      String   @unique // stored lowercase; may be an email address
+  passwordHash  String
+  role          String // viewer | editor | publisher | admin (lib/authorization/mockAuth.Role)
+  createdAt     DateTime @default(now())
+  sessions      Session[]
+}
+
+/// Server-side session, looked up by the SHA-256 hash of the opaque bearer
+/// token carried in the session cookie — the raw token itself is never
+/// persisted (same hashing convention as ConfigurationRevision.etag above).
+model Session {
+  id         String   @id @default(cuid())
+  tokenHash  String   @unique
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  expiresAt  DateTime
+
+  @@index([userId])
+}

@@ -1,0 +1,16 @@
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/dev.db
+frontend/dev.db-shm
+frontend/dev.db-wal
+frontend/.env
+frontend/tests/tmp/
+frontend/*.tsbuildinfo
+DynamicUIAppXcode/**/xcuserdata/
+DynamicUIAppXcode/**/*.xcuserstate
+ios-swiftui/.build/
+ios-swiftui/.swiftpm/
+DerivedData/
+.DS_Store

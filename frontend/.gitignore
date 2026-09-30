@@ -1,0 +1,11 @@
+node_modules/
+.next/
+out/
+build/
+dev.db
+dev.db-shm
+dev.db-wal
+tests/tmp/
+.env
+*.tsbuildinfo
+.DS_Store

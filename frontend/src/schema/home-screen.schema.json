@@ -1,0 +1,433 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sdui.internal/schemas/home-screen.schema.json",
+  "title": "HomeScreenConfiguration",
+  "description": "Normalized v2 server-driven-UI contract for the OmniCard home screen. See docs/architecture-review.md and docs/json-migration-plan.md for rationale.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "configurationId",
+    "schemaVersion",
+    "revision",
+    "status",
+    "environment",
+    "platformConstraints",
+    "theme",
+    "appIcons",
+    "navigation",
+    "screens"
+  ],
+  "properties": {
+    "configurationId": { "type": "string", "minLength": 1 },
+    "schemaVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "revision": { "type": "integer", "minimum": 1 },
+    "status": { "enum": ["draft", "published", "archived"] },
+    "environment": { "enum": ["development", "staging", "production"] },
+    "publishedAt": { "type": ["string", "null"], "format": "date-time" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "cache": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "maxAgeSeconds": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "platformConstraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["minAppVersion"],
+      "properties": {
+        "minAppVersion": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["ios", "android"],
+          "properties": {
+            "ios": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+            "android": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" }
+          }
+        }
+      }
+    },
+    "theme": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tokens"],
+      "properties": {
+        "tokens": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": { "$ref": "#/$defs/ColorPair" },
+          "propertyNames": { "pattern": "^[a-z]+(\\.[a-zA-Z0-9]+)+$" }
+        },
+        "gradients": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/GradientValue" },
+          "propertyNames": { "pattern": "^[a-z]+(\\.[a-zA-Z0-9]+)+$" }
+        }
+      }
+    },
+    "appIcons": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["defaultIconId", "supportedIconIds", "timeZone", "campaigns"],
+      "properties": {
+        "defaultIconId": { "type": "string", "minLength": 1 },
+        "supportedIconIds": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "timeZone": { "type": "string", "minLength": 1 },
+        "campaigns": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/IconCampaign" }
+        }
+      }
+    },
+    "navigation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bottom"],
+      "properties": {
+        "bottom": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/NavigationItem" }
+        }
+      }
+    },
+    "screens": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/Screen" }
+    }
+  },
+  "$defs": {
+    "ColorValue": {
+      "type": "string",
+      "pattern": "^(#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?|transparent)$"
+    },
+    "ColorPair": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["light", "dark"],
+      "properties": {
+        "light": { "$ref": "#/$defs/ColorValue" },
+        "dark": { "$ref": "#/$defs/ColorValue" }
+      }
+    },
+    "GradientStop": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["colorToken", "location"],
+      "properties": {
+        "colorToken": { "type": "string", "minLength": 1 },
+        "location": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "GradientValue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["angle", "stops"],
+      "properties": {
+        "angle": { "type": "number" },
+        "stops": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "$ref": "#/$defs/GradientStop" }
+        }
+      }
+    },
+    "IconCampaign": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "iconId", "startDate", "endDate", "priority"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "iconId": { "type": "string", "minLength": 1 },
+        "startDate": { "type": "string", "format": "date" },
+        "endDate": { "type": "string", "format": "date" },
+        "priority": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "TextValue": {
+      "type": "object",
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "required": ["kind", "value"],
+          "properties": {
+            "kind": { "const": "literal" },
+            "value": { "type": "string" }
+          }
+        },
+        {
+          "additionalProperties": false,
+          "required": ["kind", "path", "fallback"],
+          "properties": {
+            "kind": { "const": "binding" },
+            "path": { "type": "string", "pattern": "^(user|data)\\.[a-zA-Z0-9_]+$" },
+            "fallback": { "type": "string" }
+          }
+        }
+      ]
+    },
+    "AssetRef": {
+      "type": "object",
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "required": ["kind", "url"],
+          "properties": {
+            "kind": { "const": "remote" },
+            "url": { "type": "string", "format": "uri", "pattern": "^https://" }
+          }
+        },
+        {
+          "additionalProperties": false,
+          "required": ["kind", "name"],
+          "properties": {
+            "kind": { "const": "bundled" },
+            "name": { "type": "string", "minLength": 1 }
+          }
+        },
+        {
+          "additionalProperties": false,
+          "required": ["kind", "ref"],
+          "properties": {
+            "kind": { "const": "pending" },
+            "ref": { "type": "string", "minLength": 1 }
+          }
+        },
+        {
+          "additionalProperties": false,
+          "required": ["kind", "path", "fallback"],
+          "properties": {
+            "kind": { "const": "binding" },
+            "path": { "type": "string", "pattern": "^(user|data)\\.[a-zA-Z0-9_]+$" },
+            "fallback": { "$ref": "#/$defs/AssetRefStatic" }
+          }
+        }
+      ]
+    },
+    "AssetRefStatic": {
+      "type": "object",
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "required": ["kind", "url"],
+          "properties": { "kind": { "const": "remote" }, "url": { "type": "string", "format": "uri", "pattern": "^https://" } }
+        },
+        {
+          "additionalProperties": false,
+          "required": ["kind", "name"],
+          "properties": { "kind": { "const": "bundled" }, "name": { "type": "string", "minLength": 1 } }
+        }
+      ]
+    },
+    "ButtonStyle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["variant", "role"],
+      "properties": {
+        "variant": { "enum": ["solid", "outline", "ghost"] },
+        "role": { "enum": ["primary", "success", "critical", "neutral"] }
+      }
+    },
+    "ButtonSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "actionId"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "label": { "$ref": "#/$defs/TextValue" },
+        "icon": { "$ref": "#/$defs/AssetRef" },
+        "iconPosition": { "enum": ["start", "end"] },
+        "buttonStyle": { "$ref": "#/$defs/ButtonStyle" },
+        "actionId": { "type": "string", "minLength": 1 },
+        "accessibilityLabel": { "$ref": "#/$defs/TextValue" }
+      }
+    },
+    "ComponentItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "label": { "$ref": "#/$defs/TextValue" },
+        "subtitle": { "$ref": "#/$defs/TextValue" },
+        "meta": { "$ref": "#/$defs/TextValue" },
+        "media": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "leading": { "$ref": "#/$defs/AssetRef" },
+            "trailing": { "$ref": "#/$defs/AssetRef" },
+            "badge": { "$ref": "#/$defs/AssetRef" }
+          }
+        },
+        "accessibilityLabel": { "$ref": "#/$defs/TextValue" },
+        "actionId": { "type": "string", "minLength": 1 },
+        "dataSourceId": { "type": "string", "minLength": 1 },
+        "style": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "backgroundToken": { "type": "string" },
+            "backgroundGradientToken": { "type": "string", "minLength": 1 },
+            "borderToken": { "type": "string", "minLength": 1 }
+          }
+        },
+        "buttons": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ButtonSpec" }
+        }
+      }
+    },
+    "AudienceCondition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["field", "operator", "value"],
+      "properties": {
+        "field": { "enum": ["user.type", "user.role", "user.planType", "app.version", "feature.flag"] },
+        "operator": { "enum": ["eq", "neq", "in", "notIn", "gte", "lte"] },
+        "value": {
+          "oneOf": [
+            { "type": "string" },
+            { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+          ]
+        }
+      }
+    },
+    "AudienceRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "all": { "type": "array", "items": { "$ref": "#/$defs/AudienceCondition" }, "minItems": 1 },
+        "any": { "type": "array", "items": { "$ref": "#/$defs/AudienceCondition" }, "minItems": 1 },
+        "none": { "type": "array", "items": { "$ref": "#/$defs/AudienceCondition" }, "minItems": 1 }
+      }
+    },
+    "NavigationItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "icon", "actionId"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "label": { "$ref": "#/$defs/TextValue" },
+        "icon": { "$ref": "#/$defs/AssetRef" },
+        "actionId": { "type": "string", "minLength": 1 },
+        "variant": { "enum": ["standard", "elevatedCenter"] },
+        "audience": { "$ref": "#/$defs/AudienceRule" }
+      }
+    },
+    "Layout": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "orientation": { "enum": ["horizontal", "vertical"] },
+        "viewType": { "enum": ["fixed", "scroll"] },
+        "itemSizing": { "enum": ["intrinsic", "fillViewport", "pagedFullWidth"] },
+        "columns": { "type": "integer", "minimum": 1, "maximum": 6 }
+      }
+    },
+    "ComponentProps": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "title": { "$ref": "#/$defs/TextValue" },
+        "nameField": { "type": "string" },
+        "profileImageField": { "type": "string" },
+        "rightActions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "icon", "actionId"],
+            "properties": {
+              "id": { "type": "string" },
+              "icon": { "$ref": "#/$defs/AssetRef" },
+              "actionId": { "type": "string" },
+              "badgeCountField": { "type": "string" }
+            }
+          }
+        },
+        "subDetails": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "variants": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["audience", "valueBinding"],
+                "properties": {
+                  "audience": { "$ref": "#/$defs/AudienceRule" },
+                  "textType": { "enum": ["plain_text", "badge"] },
+                  "valueBinding": { "$ref": "#/$defs/TextValue" },
+                  "icon": { "$ref": "#/$defs/AssetRef" },
+                  "actionId": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "dataSourceId": { "type": "string", "minLength": 1 },
+        "topItems": { "type": "array", "items": { "$ref": "#/$defs/ComponentItem" } },
+        "items": { "type": "array", "items": { "$ref": "#/$defs/ComponentItem" } },
+        "bottomItems": { "type": "array", "items": { "$ref": "#/$defs/ComponentItem" } }
+      }
+    },
+    "Component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["componentId", "type", "componentVersion", "enabled", "style", "props"],
+      "properties": {
+        "componentId": { "type": "string", "minLength": 1 },
+        "type": {
+          "enum": ["header", "quickActions", "actionCenter", "bannerCarousel", "rechargeBills", "monthlyClaim", "rewardsHub", "unsupported"]
+        },
+        "componentVersion": { "type": "integer", "minimum": 1 },
+        "enabled": { "type": "boolean" },
+        "audience": { "$ref": "#/$defs/AudienceRule" },
+        "style": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["backgroundToken"],
+          "properties": { "backgroundToken": { "type": "string", "minLength": 1 } }
+        },
+        "layout": { "$ref": "#/$defs/Layout" },
+        "props": { "$ref": "#/$defs/ComponentProps" }
+      }
+    },
+    "ScreenStyle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["backgroundToken", "statusBarStyle"],
+      "properties": {
+        "backgroundToken": { "type": "string", "minLength": 1 },
+        "statusBarStyle": { "enum": ["auto", "lightContent", "darkContent"] },
+        "backgroundGradientToken": { "type": "string", "minLength": 1 }
+      }
+    },
+    "Screen": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["screenId", "title", "style", "components"],
+      "properties": {
+        "screenId": { "type": "string", "minLength": 1 },
+        "title": { "type": "string", "minLength": 1 },
+        "style": { "$ref": "#/$defs/ScreenStyle" },
+        "components": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/Component" }
+        }
+      }
+    }
+  }
+}
