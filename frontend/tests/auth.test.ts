@@ -45,15 +45,15 @@ describe("session store", () => {
     const { hashPassword } = await import("@/lib/authentication/passwordHash");
     const { getSessionStore } = await import("@/lib/authentication/session");
 
-    const user = getUserRepository().createUser(`session-user-${randomUUID()}@local`, hashPassword("p@ssword1"), "editor");
+    const user = await getUserRepository().createUser(`session-user-${randomUUID()}@local`, hashPassword("p@ssword1"), "editor");
     const store = getSessionStore();
-    const session = store.create(user.id);
+    const session = await store.create(user.id);
 
-    const resolved = store.resolveUser(session.token);
+    const resolved = await store.resolveUser(session.token);
     expect(resolved?.id).toBe(user.id);
 
-    store.destroy(session.token);
-    expect(store.resolveUser(session.token)).toBeNull();
+    await store.destroy(session.token);
+    expect(await store.resolveUser(session.token)).toBeNull();
   });
 
   it("rejects an expired session", async () => {
@@ -62,19 +62,23 @@ describe("session store", () => {
     const { getSessionStore } = await import("@/lib/authentication/session");
     const { getDb } = await import("@/lib/db/sqlite");
 
-    const user = getUserRepository().createUser(`expired-user-${randomUUID()}@local`, hashPassword("p@ssword1"), "viewer");
+    const user = await getUserRepository().createUser(`expired-user-${randomUUID()}@local`, hashPassword("p@ssword1"), "viewer");
     const store = getSessionStore();
-    const session = store.create(user.id);
+    const session = await store.create(user.id);
 
     // Backdate expiresAt directly — SessionStore's own API always sets a
     // future expiry, so this is the only way to exercise the expiry path
     // without mocking the system clock.
-    getDb().prepare("UPDATE Session SET expiresAt = @past WHERE tokenHash IS NOT NULL AND userId = @userId").run({
-      past: new Date(Date.now() - 1000).toISOString(),
-      userId: user.id,
+    const db = await getDb();
+    await db.execute({
+      sql: "UPDATE Session SET expiresAt = @past WHERE tokenHash IS NOT NULL AND userId = @userId",
+      args: {
+        past: new Date(Date.now() - 1000).toISOString(),
+        userId: user.id,
+      },
     });
 
-    expect(store.resolveUser(session.token)).toBeNull();
+    expect(await store.resolveUser(session.token)).toBeNull();
   });
 });
 
@@ -86,7 +90,7 @@ describe("POST /api/v1/auth/login", () => {
     const { POST } = await import("@/app/api/v1/auth/login/route");
 
     const username = `login-user-${randomUUID()}@local`;
-    getUserRepository().createUser(username, hashPassword("correct-password"), "admin");
+    await getUserRepository().createUser(username, hashPassword("correct-password"), "admin");
 
     const res = await POST(jsonReq(`${BASE}/login`, { method: "POST", body: { username, password: "correct-password" } }));
     expect(res.status).toBe(200);
@@ -111,7 +115,7 @@ describe("POST /api/v1/auth/login", () => {
     const { POST } = await import("@/app/api/v1/auth/login/route");
 
     const username = `wrongpass-user-${randomUUID()}@local`;
-    getUserRepository().createUser(username, hashPassword("correct-password"), "viewer");
+    await getUserRepository().createUser(username, hashPassword("correct-password"), "viewer");
 
     const res = await POST(jsonReq(`${BASE}/login`, { method: "POST", body: { username, password: "incorrect-password" } }));
     expect(res.status).toBe(401);
@@ -152,7 +156,7 @@ describe("GET /api/v1/auth/me and POST /api/v1/auth/logout", () => {
     expect(noCookieRes.status).toBe(401);
 
     const username = `me-user-${randomUUID()}@local`;
-    getUserRepository().createUser(username, hashPassword("p@ssword1"), "publisher");
+    await getUserRepository().createUser(username, hashPassword("p@ssword1"), "publisher");
     const loginRes = await LOGIN(jsonReq(`${BASE}/login`, { method: "POST", body: { username, password: "p@ssword1" } }));
     const token = loginRes.cookies.get(SESSION_COOKIE_NAME)?.value;
     expect(token).toBeTruthy();

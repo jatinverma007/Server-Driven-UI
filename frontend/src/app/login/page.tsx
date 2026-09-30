@@ -30,7 +30,7 @@ export default async function LoginPage({
   // and a bookmarked /login link not re-prompting a signed-in user).
   const cookieStore = await cookies();
   const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
-  if (token && getSessionStore().resolveUser(token)) {
+  if (token && (await getSessionStore().resolveUser(token))) {
     redirect(redirectTo);
   }
 

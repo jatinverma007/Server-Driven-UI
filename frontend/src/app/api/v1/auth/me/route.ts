@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
   try {
     const token = readSessionToken(req);
     if (!token) throw new UnauthorizedError();
-    const user = getSessionStore().resolveUser(token);
+    const user = await getSessionStore().resolveUser(token);
     if (!user) throw new UnauthorizedError("Session expired or invalid. Please log in again.");
     return NextResponse.json({ user: toPublicUser(user) });
   } catch (err) {

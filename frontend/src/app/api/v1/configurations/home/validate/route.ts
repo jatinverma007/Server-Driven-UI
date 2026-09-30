@@ -10,7 +10,7 @@ const repo = getConfigurationRepository();
  * omitted, the current draft) without persisting or publishing anything. */
 export async function POST(req: NextRequest) {
   try {
-    const actor = resolveActor(req);
+    const actor = await resolveActor(req);
     requirePermission(actor, "validate");
     const tooLarge = checkBodySize(req);
     if (tooLarge) return tooLarge;
@@ -21,13 +21,13 @@ export async function POST(req: NextRequest) {
     } catch {
       body = null;
     }
-    const target = body ?? repo.getDraft(SCREEN_KEY)?.content;
+    const target = body ?? (await repo.getDraft(SCREEN_KEY))?.content;
     if (!target) {
       return NextResponse.json({ valid: false, errors: [{ code: "E_NO_TARGET", path: "(root)", message: "No body provided and no draft exists.", severity: "error" }], warnings: [] }, { status: 400 });
     }
 
     const result = validateHomeScreenConfiguration(target);
-    repo.appendAudit({
+    await repo.appendAudit({
       screenKey: SCREEN_KEY,
       action: "validated",
       actor: actor.id,

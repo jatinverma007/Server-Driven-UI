@@ -16,10 +16,10 @@ const repo = getConfigurationRepository();
  */
 export async function GET(req: NextRequest) {
   try {
-    const actor = resolveActor(req);
+    const actor = await resolveActor(req);
     requirePermission(actor, "read");
 
-    const published = repo.getPublished(SCREEN_KEY);
+    const published = await repo.getPublished(SCREEN_KEY);
     if (!published) {
       return jsonError(404, "E_NO_PUBLISHED_REVISION", "No revision has been published for this screen yet.");
     }

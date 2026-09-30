@@ -28,7 +28,7 @@ function usageAndExit(message?: string): never {
   process.exit(1);
 }
 
-function main() {
+async function main() {
   const args = process.argv.slice(2).filter((a) => a !== "--update");
   const update = process.argv.includes("--update");
   const [username, password, role] = args;
@@ -38,20 +38,23 @@ function main() {
   if (password.length < 8) usageAndExit("password must be at least 8 characters.");
 
   const repo = getUserRepository();
-  const existing = repo.findByUsername(username);
+  const existing = await repo.findByUsername(username);
   const passwordHash = hashPassword(password);
 
   if (existing) {
     if (!update) {
       usageAndExit(`A user "${username}" already exists. Pass --update to reset their password/role.`);
     }
-    repo.updateCredentials(existing.id, passwordHash, role as Role);
+    await repo.updateCredentials(existing.id, passwordHash, role as Role);
     console.log(`Updated user "${username}" (role: ${role}).`);
     return;
   }
 
-  const created = repo.createUser(username, passwordHash, role as Role);
+  const created = await repo.createUser(username, passwordHash, role as Role);
   console.log(`Created user "${created.username}" (role: ${created.role}, id: ${created.id}).`);
 }
 
-main();
+main().catch((err) => {
+  console.error("Unexpected error:", err);
+  process.exit(1);
+});

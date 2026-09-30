@@ -47,15 +47,15 @@ export async function POST(req: NextRequest) {
       return jsonError(429, "E_RATE_LIMITED", "Too many login attempts. Please wait a moment and try again.");
     }
 
-    const user = getUserRepository().findByUsername(username);
+    const user = await getUserRepository().findByUsername(username);
     const genericError = () => jsonError(401, "E_INVALID_CREDENTIALS", "Incorrect username/email or password.");
 
     if (!user) return genericError();
     if (!verifyPassword(password, user.passwordHash)) return genericError();
 
     const sessionStore = getSessionStore();
-    sessionStore.purgeExpired();
-    const session = sessionStore.create(user.id);
+    await sessionStore.purgeExpired();
+    const session = await sessionStore.create(user.id);
 
     const response = NextResponse.json({ user: toPublicUser(user) });
     response.cookies.set(SESSION_COOKIE_NAME, session.token, sessionCookieOptions(SESSION_TTL_SECONDS));

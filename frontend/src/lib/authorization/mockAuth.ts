@@ -47,7 +47,11 @@ export class UnauthorizedError extends Error {
   }
 }
 
-export function resolveActor(req: NextRequest): Actor {
+/** Async because the production path validates the session against the
+ * database (`@libsql/client` — every call is a network round trip even for
+ * a local `file:` database, see `lib/db/sqlite.ts`). Every call site awaits
+ * this. */
+export async function resolveActor(req: NextRequest): Promise<Actor> {
   if (process.env.NODE_ENV === "test") {
     const headerRole = req.headers.get("x-user-role");
     const headerId = req.headers.get("x-user-id");
@@ -60,7 +64,7 @@ export function resolveActor(req: NextRequest): Actor {
 
   const token = readSessionToken(req);
   if (!token) throw new UnauthorizedError();
-  const user = getSessionStore().resolveUser(token);
+  const user = await getSessionStore().resolveUser(token);
   if (!user) throw new UnauthorizedError("Session expired or invalid. Please log in again.");
   return { id: user.username, role: user.role as Role };
 }

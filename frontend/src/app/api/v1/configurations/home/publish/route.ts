@@ -18,7 +18,7 @@ const repo = getConfigurationRepository();
  */
 export async function POST(req: NextRequest) {
   try {
-    const actor = resolveActor(req);
+    const actor = await resolveActor(req);
     requirePermission(actor, "publish");
 
     if (!checkRateLimit(`publish:${actor.id}`, 10)) {
@@ -34,14 +34,14 @@ export async function POST(req: NextRequest) {
     } catch {
       body = null;
     }
-    const target = body ?? repo.getDraft(SCREEN_KEY)?.content;
+    const target = body ?? (await repo.getDraft(SCREEN_KEY))?.content;
     if (!target) {
       return jsonError(400, "E_NO_TARGET", "No body provided and no draft exists to publish.");
     }
 
     const result = validateHomeScreenConfiguration(target);
     if (!result.valid) {
-      repo.appendAudit({
+      await repo.appendAudit({
         screenKey: SCREEN_KEY,
         action: "publish_rejected",
         actor: actor.id,
@@ -51,8 +51,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ published: false, ...result }, { status: 422 });
     }
 
-    const published = repo.publish(SCREEN_KEY, target, actor.id);
-    repo.appendAudit({
+    const published = await repo.publish(SCREEN_KEY, target, actor.id);
+    await repo.appendAudit({
       screenKey: SCREEN_KEY,
       action: "published",
       actor: actor.id,

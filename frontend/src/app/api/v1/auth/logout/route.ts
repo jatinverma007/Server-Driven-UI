@@ -9,7 +9,7 @@ import { SESSION_COOKIE_NAME, readSessionToken, sessionCookieOptions } from "@/l
 export async function POST(req: NextRequest) {
   try {
     const token = readSessionToken(req);
-    if (token) getSessionStore().destroy(token);
+    if (token) await getSessionStore().destroy(token);
 
     const response = NextResponse.json({ ok: true });
     // maxAge: 0 deletes the cookie immediately — same attributes as the set

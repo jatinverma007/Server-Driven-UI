@@ -21,55 +21,58 @@ export interface CreatedSession {
 }
 
 export class SessionStore {
-  private get db() {
+  private db() {
     return getDb();
   }
 
-  create(userId: string): CreatedSession {
+  async create(userId: string): Promise<CreatedSession> {
+    const db = await this.db();
     const token = randomBytes(32).toString("hex");
     const now = new Date();
     const expiresAt = new Date(now.getTime() + SESSION_TTL_MS);
-    this.db
-      .prepare(
-        `INSERT INTO Session (id, tokenHash, userId, createdAt, expiresAt)
-         VALUES (@id, @tokenHash, @userId, @createdAt, @expiresAt)`
-      )
-      .run({
+    await db.execute({
+      sql: `INSERT INTO Session (id, tokenHash, userId, createdAt, expiresAt)
+            VALUES (@id, @tokenHash, @userId, @createdAt, @expiresAt)`,
+      args: {
         id: randomUUID(),
         tokenHash: hashToken(token),
         userId,
         createdAt: now.toISOString(),
         expiresAt: expiresAt.toISOString(),
-      });
+      },
+    });
     return { token, expiresAt };
   }
 
   /** Validates a raw token and returns its owning user, or `null` if the
    * token is missing, unknown, or expired. Lazily deletes an expired row
    * rather than requiring a separate sweep job — fine at this PoC's scale. */
-  resolveUser(token: string): UserRecord | null {
-    const row = this.db
-      .prepare<{ tokenHash: string }, { id: string; userId: string; expiresAt: string }>(
-        "SELECT id, userId, expiresAt FROM Session WHERE tokenHash = @tokenHash"
-      )
-      .get({ tokenHash: hashToken(token) });
+  async resolveUser(token: string): Promise<UserRecord | null> {
+    const db = await this.db();
+    const rs = await db.execute({
+      sql: "SELECT id, userId, expiresAt FROM Session WHERE tokenHash = @tokenHash",
+      args: { tokenHash: hashToken(token) },
+    });
+    const row = rs.rows[0] as { id: string; userId: string; expiresAt: string } | undefined;
     if (!row) return null;
     if (new Date(row.expiresAt).getTime() <= Date.now()) {
-      this.db.prepare("DELETE FROM Session WHERE id = @id").run({ id: row.id });
+      await db.execute({ sql: "DELETE FROM Session WHERE id = @id", args: { id: row.id } });
       return null;
     }
     return getUserRepository().findById(row.userId);
   }
 
-  destroy(token: string): void {
-    this.db.prepare("DELETE FROM Session WHERE tokenHash = @tokenHash").run({ tokenHash: hashToken(token) });
+  async destroy(token: string): Promise<void> {
+    const db = await this.db();
+    await db.execute({ sql: "DELETE FROM Session WHERE tokenHash = @tokenHash", args: { tokenHash: hashToken(token) } });
   }
 
   /** Best-effort cleanup of expired rows — not called on every request;
    * wired into login so the table doesn't grow unbounded over a long-lived
    * dev server. */
-  purgeExpired(): void {
-    this.db.prepare("DELETE FROM Session WHERE expiresAt <= @now").run({ now: new Date().toISOString() });
+  async purgeExpired(): Promise<void> {
+    const db = await this.db();
+    await db.execute({ sql: "DELETE FROM Session WHERE expiresAt <= @now", args: { now: new Date().toISOString() } });
   }
 }
 

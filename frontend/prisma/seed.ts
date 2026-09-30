@@ -20,7 +20,7 @@ function loadFixture(name: string): HomeScreenConfiguration {
   return JSON.parse(readFileSync(p, "utf8"));
 }
 
-function main() {
+async function main() {
   const repo = getConfigurationRepository();
   const seed = loadFixture("home-screen.valid.json");
 
@@ -32,17 +32,17 @@ function main() {
   }
 
   // Draft: same content, marked as draft, so the portal has something to edit immediately.
-  repo.saveDraft(SCREEN_KEY, { ...seed, status: "draft" }, SEED_ACTOR);
-  repo.appendAudit({ screenKey: SCREEN_KEY, action: "draft_saved", actor: SEED_ACTOR, role: "admin", detail: "Seeded initial draft." });
+  await repo.saveDraft(SCREEN_KEY, { ...seed, status: "draft" }, SEED_ACTOR);
+  await repo.appendAudit({ screenKey: SCREEN_KEY, action: "draft_saved", actor: SEED_ACTOR, role: "admin", detail: "Seeded initial draft." });
 
   // Published revision 1.
-  const existing = repo.getPublished(SCREEN_KEY);
+  const existing = await repo.getPublished(SCREEN_KEY);
   if (existing) {
     console.log(`Published revision already exists (revision ${existing.revision}) — skipping publish, draft re-seeded.`);
     return;
   }
-  const published = repo.publish(SCREEN_KEY, seed, SEED_ACTOR);
-  repo.appendAudit({
+  const published = await repo.publish(SCREEN_KEY, seed, SEED_ACTOR);
+  await repo.appendAudit({
     screenKey: SCREEN_KEY,
     action: "published",
     actor: SEED_ACTOR,
@@ -53,4 +53,7 @@ function main() {
   console.log(`Seeded draft + published revision ${published.revision} (etag ${published.etag}).`);
 }
 
-main();
+main().catch((err) => {
+  console.error("Unexpected error:", err);
+  process.exit(1);
+});

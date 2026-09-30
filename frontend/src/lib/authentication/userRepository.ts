@@ -1,7 +1,7 @@
 /**
- * User persistence — same raw-SQL/`better-sqlite3` style as
- * `lib/configuration/repository.ts` (prepared statements, `@param`
- * binding), against the `User` table added in `lib/db/sqlite.ts`.
+ * User persistence — same `@libsql/client` style as
+ * `lib/configuration/repository.ts` (async, `@param` binding), against the
+ * `User` table added in `lib/db/sqlite.ts`.
  *
  * There is no self-service signup (per the spec: "Users will be manually
  * added to the database") — the only writer is `scripts/create-user.ts`,
@@ -34,31 +34,32 @@ function normalizeUsername(username: string): string {
 }
 
 export class UserRepository {
-  private get db() {
+  private db() {
     return getDb();
   }
 
-  findByUsername(username: string): UserRecord | null {
-    const row = this.db
-      .prepare<{ username: string }, UserRecord>(
-        "SELECT id, username, passwordHash, role, createdAt FROM User WHERE username = @username"
-      )
-      .get({ username: normalizeUsername(username) });
-    return row ?? null;
+  async findByUsername(username: string): Promise<UserRecord | null> {
+    const db = await this.db();
+    const rs = await db.execute({
+      sql: "SELECT id, username, passwordHash, role, createdAt FROM User WHERE username = @username",
+      args: { username: normalizeUsername(username) },
+    });
+    return (rs.rows[0] as unknown as UserRecord | undefined) ?? null;
   }
 
-  findById(id: string): UserRecord | null {
-    const row = this.db
-      .prepare<{ id: string }, UserRecord>(
-        "SELECT id, username, passwordHash, role, createdAt FROM User WHERE id = @id"
-      )
-      .get({ id });
-    return row ?? null;
+  async findById(id: string): Promise<UserRecord | null> {
+    const db = await this.db();
+    const rs = await db.execute({
+      sql: "SELECT id, username, passwordHash, role, createdAt FROM User WHERE id = @id",
+      args: { id },
+    });
+    return (rs.rows[0] as unknown as UserRecord | undefined) ?? null;
   }
 
   /** Throws (UNIQUE constraint) if the username already exists — surfaced
    * as a friendly message by `scripts/create-user.ts`. */
-  createUser(username: string, passwordHash: string, role: Role): UserRecord {
+  async createUser(username: string, passwordHash: string, role: Role): Promise<UserRecord> {
+    const db = await this.db();
     const record: UserRecord = {
       id: randomUUID(),
       username: normalizeUsername(username),
@@ -66,29 +67,29 @@ export class UserRepository {
       role,
       createdAt: new Date().toISOString(),
     };
-    this.db
-      .prepare(
-        `INSERT INTO User (id, username, passwordHash, role, createdAt)
-         VALUES (@id, @username, @passwordHash, @role, @createdAt)`
-      )
-      .run(record);
+    await db.execute({
+      sql: `INSERT INTO User (id, username, passwordHash, role, createdAt)
+            VALUES (@id, @username, @passwordHash, @role, @createdAt)`,
+      args: { ...record },
+    });
     return record;
   }
 
   /** Used only by `scripts/create-user.ts --update` — resets an existing
    * user's password/role for local testing convenience. Never exposed
    * through an API route (no self-service password change in this PoC). */
-  updateCredentials(id: string, passwordHash: string, role: Role): void {
-    this.db
-      .prepare("UPDATE User SET passwordHash = @passwordHash, role = @role WHERE id = @id")
-      .run({ id, passwordHash, role });
+  async updateCredentials(id: string, passwordHash: string, role: Role): Promise<void> {
+    const db = await this.db();
+    await db.execute({
+      sql: "UPDATE User SET passwordHash = @passwordHash, role = @role WHERE id = @id",
+      args: { id, passwordHash, role },
+    });
   }
 
-  listUsers(): PublicUser[] {
-    const rows = this.db
-      .prepare<[], UserRecord>("SELECT id, username, passwordHash, role, createdAt FROM User ORDER BY createdAt ASC")
-      .all() as UserRecord[];
-    return rows.map(toPublicUser);
+  async listUsers(): Promise<PublicUser[]> {
+    const db = await this.db();
+    const rs = await db.execute("SELECT id, username, passwordHash, role, createdAt FROM User ORDER BY createdAt ASC");
+    return (rs.rows as unknown as UserRecord[]).map(toPublicUser);
   }
 }
 
